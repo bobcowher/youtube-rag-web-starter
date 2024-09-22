@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>Admin Panel</h2>
+
+        <!-- File Upload Section -->
+        <div id="upload-section">
+            <h3>Upload Files</h3>
+            <form action="{{ url_for('upload_file_post') }}" method="POST" enctype="multipart/form-data">
+                <div>
+                    <input type="file" name="file" required>
+                </div>
+                <div>
+                    <button type="submit">Upload File</button>
+                </div>
+            </form>
+        </div>
+
+        <hr>
+
+        <!-- File Processing Section -->
+        <div id="process-section">
+            <h3>Process Files</h3>
+            <button onclick="processFiles()">Process Files</button>
+            <div id="spinner" style="display: none;">
+                <img src="{{ url_for('static', filename='spinner.gif') }}" alt="Processing..." />
+            </div>
+            <div id="process-status"></div>
+        </div>
+
+        <a href="{{ url_for('chat') }}">Back to Chat</a>
+    </div>
+
+    <script>
+        function processFiles() {
+            // Show spinner while processing
+            document.getElementById('spinner').style.display = 'block';
+            document.getElementById('process-status').innerHTML = '';
+
+            fetch('/process_files', {
+                method: 'POST'
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // Hide spinner after processing
+                    document.getElementById('spinner').style.display = 'none';
+                    // Show the result
+                    document.getElementById('process-status').innerHTML = data.status;
+                });
+        }
+    </script>
+
+</body>
+
+</html>

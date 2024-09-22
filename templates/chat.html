@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Chat</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>The Librarian</h2>
+
+        <div id="chatbox">
+            <p class="bot-message"><strong>Bot:</strong> Hello! I'm The Librarian, here to answer questions from my library of books. To upload new books, go to /admin. Otherwise, just start asking questions!</p>
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="userInput" placeholder="Type your message here...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        function sendMessage() {
+            const userInput = document.getElementById('userInput').value;
+            if (userInput.trim() === "") {
+                return;
+            }
+
+            const chatbox = document.getElementById('chatbox');
+            const userMessage = `<p class="user-message"><strong>You:</strong> ${userInput}</p>`;
+            chatbox.innerHTML += userMessage;
+
+            fetch('/send_message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `message=${encodeURIComponent(userInput)}`
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const botResponse = `<p class="bot-message"><strong>Bot:</strong> ${data.response}</p>`;
+                    chatbox.innerHTML += botResponse;
+
+                    chatbox.scrollTop = chatbox.scrollHeight;
+                });
+
+            document.getElementById('userInput').value = "";
+        }
+
+        // Add event listener for 'Enter' key
+        document.getElementById('userInput').addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent default Enter key behavior (e.g., form submission)
+                sendMessage(); // Trigger the send message function
+            }
+        });
+    </script>
+
+</body>
+
+</html>
